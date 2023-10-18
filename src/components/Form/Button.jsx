@@ -11,4 +11,7 @@ export default function Button({ variant='contained', children, ...props }) {
 
 const StyledMuiButton = styled(MuiButton)`
   margin-top: 8px !important;
+  background-color: #E0E0E0 !important;
+  color: #000 !important;
+  box-shadow: rgba(149, 157, 165, 0.3) 0px 8px 24px !important;
 `;
