@@ -6,7 +6,7 @@ export default function ReserveTicket({ value }) {
     return (
         <StyledReserveTicket>
             <Typo variant="h6" color="#8E8E8E">
-                Fechado! O total ficou em R$ {value}. Agora é só confirmar:
+                Fechado! O total ficou em <strong>R$ {value}</strong>. Agora é só confirmar:
             </Typo>
             <Button /*onClick={onClick}*/>
                 RESERVAR INGRESSO

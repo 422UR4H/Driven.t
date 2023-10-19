@@ -10,15 +10,24 @@ export default function TicketAndPayment() {
     const { enrollment } = useEnrollment();
     const [modality, setModality] = useState(undefined);
     const [haveHotel, setHaveHotel] = useState(undefined);
-    const [remoteTicket, setRemoteTicket] = useState(undefined);
-    const [ticketWithHotel, setTicketWithHotel] = useState(undefined);
-    const [ticketWithoutHotel, setTicketWithoutHotel] = useState(undefined);
+    const [hotelPrice, setHotelPrice] = useState(undefined);
+    const [remoteTicketPrice, setRemoteTicketPrice] = useState(undefined);
+    const [ticketWithoutHotelPrice, setTicketWithoutHotelPrice] = useState(undefined);
     const {
         ticketTypes,
         ticketTypesProcess,
         ticketTypesLoading,
         ticketTypesError
     } = useTicketTypes();
+
+    function handlePrice() {
+        if (modality === "Online") return remoteTicketPrice / 100;
+        if (modality === "Presencial") {
+            if (haveHotel === "Sem Hotel") return ticketWithoutHotelPrice / 100;
+            if (haveHotel === "Com Hotel") return (ticketWithoutHotelPrice + hotelPrice) / 100;
+        }
+        return 0;
+    }
 
     async function instanceTicketTypes() {
         await ticketTypesProcess();
@@ -31,10 +40,11 @@ export default function TicketAndPayment() {
     
     useEffect(() => {
         if (ticketTypes && ticketTypes.length > 0) {
-            console.log(ticketTypes)
-            setRemoteTicket(ticketTypes.find(t => t.isRemote));
-            setTicketWithHotel(ticketTypes.find(t => !t.isRemote && t.includesHotel));
-            setTicketWithoutHotel(ticketTypes.find(t => !t.isRemote && !t.includesHotel));
+            const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
+            const priceWithHotel = ticketTypes.find(t => !t.isRemote && t.includesHotel).price;
+            setTicketWithoutHotelPrice(priceWithoutHotel);
+            setHotelPrice(priceWithHotel - priceWithoutHotel)
+            setRemoteTicketPrice(ticketTypes.find(t => t.isRemote).price);
         } 
     }, [ticketTypes]);
     
@@ -57,8 +67,8 @@ export default function TicketAndPayment() {
                     <TicketContainer
                         text1="Presencial"
                         text2="Online"
-                        price1={"R$ " + (ticketWithoutHotel?.price || 100) / 100}
-                        price2={"R$ " + (remoteTicket?.price || 100) / 100}
+                        price1={"R$ " + (ticketWithoutHotelPrice || 100) / 100}
+                        price2={"R$ " + (remoteTicketPrice || 100) / 100}
                         option={modality}
                         setOption={setModality}
                     />
@@ -70,13 +80,13 @@ export default function TicketAndPayment() {
                             text1="Sem Hotel"
                             text2="Com Hotel"
                             price1="+ R$ 0"
-                            price2={"+ R$ " + (ticketWithHotel?.price || 100) / 100}
+                            price2={"+ R$ " + (hotelPrice || 100) / 100}
                             option={haveHotel}
                             setOption={setHaveHotel}
                         />
                     </>)}
                     {(modality === "Online" || haveHotel !== undefined) && (
-                        <ReserveTicket value={100} />
+                        <ReserveTicket value={handlePrice()} />
                     )}
                 </>
             )}
@@ -84,6 +94,7 @@ export default function TicketAndPayment() {
     );
 }
 
+// FIXME: finish this
 const StyledTicketAndPayment = styled.div`
     /* .test {
         margin-top: 100px;
