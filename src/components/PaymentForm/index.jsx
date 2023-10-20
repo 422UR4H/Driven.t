@@ -17,9 +17,9 @@ import FormValidations from './FormValidations';
 import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
 
-export default function PaymentForm() {
-
-  const [ paymentStatus, setPaymentStatus ] = useState('pending');
+export default function PaymentForm({ ticketType }) {
+  console.log(ticketType)
+  const [paymentStatus, setPaymentStatus] = useState('pending');
   const { paymentProcess } = usePayment();
 
   const {
@@ -86,78 +86,78 @@ export default function PaymentForm() {
       <TicketWrapper>
         <div>
           <Typo variant="h6">Presencial + Hotel</Typo>
-          <Typo variant="body1"color="#8E8E8E">R$ 600</Typo>
+          <Typo variant="body1" color="#8E8E8E">R$ 600</Typo>
         </div>
       </TicketWrapper>
       <Typo variant="h6" color="#8E8E8E">Pagamento</Typo>
-        <PaymentWrapper>
-          {paymentStatus === 'pending' &&
-            <>
-              <img src={creditCardExample} alt="creditCardExample" />
-              <FormWrapper onSubmit={handleSubmit}>
-                <InputWrapper>
+      <PaymentWrapper>
+        {paymentStatus === 'pending' &&
+          <>
+            <img src={creditCardExample} alt="creditCardExample" />
+            <FormWrapper onSubmit={handleSubmit}>
+              <InputWrapper>
+                <Input
+                  label="Card Number"
+                  name="number"
+                  size="small"
+                  value={data.number}
+                  mask="9999 9999 9999 9999"
+                  onChange={handleChange('number')}
+                />
+                {errors.number && <ErrorMsg>{errors.number}</ErrorMsg>}
+                <Typo variant="body1" color="#8E8E8E" fontSize="14px">E.g.: 49..., 51..., 55..., 22...</Typo>
+              </InputWrapper>
+              <InputWrapper>
+                <Input
+                  label="Name"
+                  name="name"
+                  size="small"
+                  value={data.name}
+                  onChange={handleChange('name')}
+                />
+                {errors.name && <ErrorMsg>{errors.name}</ErrorMsg>}
+              </InputWrapper>
+              <InputWrapper>
+                <div>
                   <Input
-                    label="Card Number"
-                    name="number"
+                    label="Valid Thru"
+                    name="expirationDate"
+                    type="text"
+                    mask="99/99"
                     size="small"
-                    value={data.number}
-                    mask="9999 9999 9999 9999"
-                    onChange={handleChange('number')}
+                    value={data.expirationDate}
+                    onChange={handleChange('expirationDate')}
                   />
-                  {errors.number && <ErrorMsg>{errors.number}</ErrorMsg>}
-                  <Typo variant="body1" color="#8E8E8E" fontSize="14px">E.g.: 49..., 51..., 55..., 22...</Typo>
-                </InputWrapper>
-                <InputWrapper>
                   <Input
-                    label="Name"
-                    name="name"
+                    label="CVC"
+                    name="cvv"
+                    mask="999"
                     size="small"
-                    value={data.name}
-                    onChange={handleChange('name')}
+                    value={data.cvv}
+                    onChange={handleChange('cvv')}
                   />
-                  {errors.name && <ErrorMsg>{errors.name}</ErrorMsg>}
-                </InputWrapper>
-                <InputWrapper>
-                  <div>
-                    <Input
-                      label="Valid Thru"
-                      name="expirationDate"
-                      type="text"
-                      mask="99/99"
-                      size="small"
-                      value={data.expirationDate}
-                      onChange={handleChange('expirationDate')}
-                    />
-                    <Input
-                      label="CVC"
-                      name="cvv"
-                      mask="999"
-                      size="small"
-                      value={data.cvv}
-                      onChange={handleChange('cvv')}
-                    />
-                  </div>
-                  {errors.expirationDate && <ErrorMsg>{errors.expirationDate}</ErrorMsg>}
-                  {errors.cvv && <ErrorMsg>{errors.cvv}</ErrorMsg>}
-                </InputWrapper>
-                <SubmitContainer>
-                  <Button type="submit">
-                    Finalizar Pedido
-                  </Button>
-                </SubmitContainer>
-              </FormWrapper>
-            </>
-          }
-          {paymentStatus === 'succeed' &&
-            <FinishedPaymentWrapper>
-              <img src={CheckCircleIcon} />
-              <div>
-                <Typo variant="body1">Pagamento confirmado!</Typo>
-                <Typo variant="body2" color="#606060">Prossiga para escolha de hospedagem e atividades</Typo>
-              </div>
-            </FinishedPaymentWrapper>
-          }
-        </PaymentWrapper>
+                </div>
+                {errors.expirationDate && <ErrorMsg>{errors.expirationDate}</ErrorMsg>}
+                {errors.cvv && <ErrorMsg>{errors.cvv}</ErrorMsg>}
+              </InputWrapper>
+              <SubmitContainer>
+                <Button type="submit">
+                  Finalizar Pedido
+                </Button>
+              </SubmitContainer>
+            </FormWrapper>
+          </>
+        }
+        {paymentStatus === 'succeed' &&
+          <FinishedPaymentWrapper>
+            <img src={CheckCircleIcon} />
+            <div>
+              <Typo variant="body1">Pagamento confirmado!</Typo>
+              <Typo variant="body2" color="#606060">Prossiga para escolha de hospedagem e atividades</Typo>
+            </div>
+          </FinishedPaymentWrapper>
+        }
+      </PaymentWrapper>
     </>
   )
 }

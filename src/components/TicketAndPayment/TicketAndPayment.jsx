@@ -6,7 +6,7 @@ import styled from "styled-components";
 import ReserveTicket from "./ReserveTicket.jsx";
 import useTicketTypes from "../../hooks/api/useTicketTypes.js";
 
-export default function TicketAndPayment() {
+export default function TicketAndPayment({ setStatus, setTicketType }) {
     const { enrollment } = useEnrollment();
     const [modality, setModality] = useState(undefined);
     const [haveHotel, setHaveHotel] = useState(undefined);
@@ -29,6 +29,15 @@ export default function TicketAndPayment() {
         return 0;
     }
 
+    function handleUserTicket() {
+        const isRemote = modality === "Online";
+        if (isRemote) {
+            return ticketTypes.find(t => t.includesHotel === false && t.isRemote === isRemote);
+        }
+        const includesHotel = haveHotel === "Com Hotel";
+        return ticketTypes.find(t => t.includesHotel === includesHotel && t.isRemote === false);
+    }
+
     async function instanceTicketTypes() {
         await ticketTypesProcess();
     }
@@ -37,17 +46,21 @@ export default function TicketAndPayment() {
         instanceTicketTypes();
         // if (ticketTypesError) // FIXME: finish this
     }, [ticketTypesError]);
-    
+
     useEffect(() => {
-        if (ticketTypes && ticketTypes.length > 0) {
+        if (ticketTypes && ticketTypes?.length > 0) {
             const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
             const priceWithHotel = ticketTypes.find(t => !t.isRemote && t.includesHotel).price;
             setTicketWithoutHotelPrice(priceWithoutHotel);
             setHotelPrice(priceWithHotel - priceWithoutHotel)
             setRemoteTicketPrice(ticketTypes.find(t => t.isRemote).price);
-        } 
+        }
     }, [ticketTypes]);
-    
+
+    async function handleClick() {
+        setTicketType(handleUserTicket());
+        setStatus("payment");
+    }
 
     return (
         <StyledTicketAndPayment>
@@ -67,7 +80,7 @@ export default function TicketAndPayment() {
                     <TicketContainer
                         text1="Presencial"
                         text2="Online"
-                        price1={"R$ " + (ticketWithoutHotelPrice || 100) / 100}
+                        price1={"R$ " + (ticketWithoutHotelPrice || 100) / 100} // FIXME: formatPrice and toPrecision
                         price2={"R$ " + (remoteTicketPrice || 100) / 100}
                         option={modality}
                         setOption={setModality}
@@ -86,7 +99,10 @@ export default function TicketAndPayment() {
                         />
                     </>)}
                     {(modality === "Online" || haveHotel !== undefined) && (
-                        <ReserveTicket value={handlePrice()} />
+                        <ReserveTicket
+                            value={handlePrice()}
+                            handleClick={handleClick}
+                        />
                     )}
                 </>
             )}
