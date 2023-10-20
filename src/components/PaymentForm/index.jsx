@@ -1,8 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Typo from '../Dashboard/Content/Typo.jsx';
 import { toast } from 'react-toastify';
 import { useForm } from '../../hooks/useForm';
+import useTicket from '../../hooks/api/useTicket';
 import { TicketWrapper } from './TicketWrapper';
 import { PaymentWrapper } from './PaymentWrapper';
 import { FormWrapper } from './FormWrapper';
@@ -13,13 +15,14 @@ import Input from '../Form/Input';
 import Button from '../Form/Button';
 import usePayment from '../../hooks/api/usePayment';
 import FormValidations from './FormValidations';
+import { formatPrice } from '../../utils/formatPrice.js';
 
 import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
 
 export default function PaymentForm({ ticketType }) {
-  console.log(ticketType)
   const [paymentStatus, setPaymentStatus] = useState('pending');
+  const { createTicket } = useTicket();
   const { paymentProcess } = usePayment();
 
   const {
@@ -46,8 +49,18 @@ export default function PaymentForm({ ticketType }) {
         return;
       }
 
-      // TO-DO: adicionar ticketId no corpo da requisição
+      let ticket = null;
+
+      try {
+        ticket = await createTicket({ ticketTypeId: ticketType.id });
+      } catch (err) {
+        console.log(err.response.data.message)
+        toast('Não foi possível realizar o pagamento!');
+        return;
+      }
+
       const newData = {
+        ticketId: ticket.id,
         cardData: {
           issuer,
           number: data.number,
@@ -76,8 +89,24 @@ export default function PaymentForm({ ticketType }) {
   });
 
   useEffect(() => {
-    // TO-DO: fazer requisição pra pegar o ticket que o cliente reservou
+    if (!ticketType) return;
   }, []);
+
+  function formatTicketMessage() {
+    
+    let message = '';
+    if (ticketType.isRemote) {
+      message += 'Online';
+      return message;
+    }
+
+    if (!ticketType.includesHotel) message += 'Presencial';
+    else message += 'Presencial + Hotel';
+
+    return message;
+  }
+
+  const ticketMessage = formatTicketMessage();
 
   return (
     <>
@@ -85,8 +114,8 @@ export default function PaymentForm({ ticketType }) {
       <Typo variant="h6" color="#8E8E8E">Ingressos escolhido</Typo>
       <TicketWrapper>
         <div>
-          <Typo variant="h6">Presencial + Hotel</Typo>
-          <Typo variant="body1" color="#8E8E8E">R$ 600</Typo>
+          <Typo variant="h6">{ticketMessage}</Typo>
+          <Typo variant="body1" color="#8E8E8E">R$ {formatPrice(ticketType.price)}</Typo>
         </div>
       </TicketWrapper>
       <Typo variant="h6" color="#8E8E8E">Pagamento</Typo>

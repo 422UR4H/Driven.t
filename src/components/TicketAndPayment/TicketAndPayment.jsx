@@ -6,6 +6,8 @@ import styled from "styled-components";
 import ReserveTicket from "./ReserveTicket.jsx";
 import useTicketTypes from "../../hooks/api/useTicketTypes.js";
 
+import { formatPrice } from "../../utils/formatPrice.js";
+
 export default function TicketAndPayment({ setStatus, setTicketType }) {
     const { enrollment } = useEnrollment();
     const [modality, setModality] = useState(undefined);
@@ -21,10 +23,12 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
     } = useTicketTypes();
 
     function handlePrice() {
-        if (modality === "Online") return remoteTicketPrice / 100;
+
+        console.log(remoteTicketPrice, ticketWithoutHotelPrice, hotelPrice);
+        if (modality === "Online") return formatPrice(remoteTicketPrice);
         if (modality === "Presencial") {
-            if (haveHotel === "Sem Hotel") return ticketWithoutHotelPrice / 100;
-            if (haveHotel === "Com Hotel") return (ticketWithoutHotelPrice + hotelPrice) / 100;
+            if (haveHotel === "Sem Hotel") return formatPrice(ticketWithoutHotelPrice);
+            if (haveHotel === "Com Hotel") return formatPrice(ticketWithoutHotelPrice + hotelPrice);
         }
         return 0;
     }
@@ -52,13 +56,19 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
             const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
             const priceWithHotel = ticketTypes.find(t => !t.isRemote && t.includesHotel).price;
             setTicketWithoutHotelPrice(priceWithoutHotel);
-            setHotelPrice(priceWithHotel - priceWithoutHotel)
+            setHotelPrice(Math.abs(priceWithHotel - priceWithoutHotel))
             setRemoteTicketPrice(ticketTypes.find(t => t.isRemote).price);
         }
     }, [ticketTypes]);
 
     async function handleClick() {
-        setTicketType(handleUserTicket());
+
+        const ticketType = handleUserTicket();
+        if (!ticketType.isRemote && ticketType.includesHotel) {
+            ticketType.price = ticketWithoutHotelPrice + hotelPrice;
+        }
+
+        setTicketType(ticketType);
         setStatus("payment");
     }
 
@@ -80,8 +90,8 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
                     <TicketContainer
                         text1="Presencial"
                         text2="Online"
-                        price1={"R$ " + (ticketWithoutHotelPrice || 100) / 100} // FIXME: formatPrice and toPrecision
-                        price2={"R$ " + (remoteTicketPrice || 100) / 100}
+                        price1={"R$ " + formatPrice(ticketWithoutHotelPrice)} // FIXME: formatPrice and toPrecision
+                        price2={"R$ " + formatPrice(remoteTicketPrice)}
                         option={modality}
                         setOption={setModality}
                     />
@@ -93,7 +103,7 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
                             text1="Sem Hotel"
                             text2="Com Hotel"
                             price1="+ R$ 0"
-                            price2={"+ R$ " + (hotelPrice || 100) / 100}
+                            price2={"+ R$ " + formatPrice(hotelPrice)}
                             option={haveHotel}
                             setOption={setHaveHotel}
                         />
