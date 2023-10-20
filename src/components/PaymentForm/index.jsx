@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Typo from '../Dashboard/Content/Typo.jsx';
 import { toast } from 'react-toastify';
 import { useForm } from '../../hooks/useForm';
-import useTicket from '../../hooks/api/useTicket';
+import { useCreateTicket } from '../../hooks/api/useTicket';
 import { TicketWrapper } from './TicketWrapper';
 import { PaymentWrapper } from './PaymentWrapper';
 import { FormWrapper } from './FormWrapper';
@@ -22,7 +22,7 @@ import creditCardExample from '../../assets/images/creditCard.png';
 
 export default function PaymentForm({ ticketType }) {
   const [paymentStatus, setPaymentStatus] = useState('pending');
-  const { createTicket } = useTicket();
+  const { createTicket } = useCreateTicket();
   const { paymentProcess } = usePayment();
 
   const {
