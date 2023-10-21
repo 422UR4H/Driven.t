@@ -22,17 +22,28 @@ export default function Payment() {
 
   }, [status]);
 
-  console.log(status);
-
   return (
     <>
-      {status === "pending" && <TicketAndPayment setStatus={setStatus} setTicketType={setTicketType} /> }
-      {status === "payment" && <PaymentForm ticketType={ticketType} /> }
-      {status === "finished" && 
+      <Typo variant="h4">Ingressos e pagamento</Typo>
+
+      {status === "pending" &&
+        <TicketAndPayment 
+          setStatus={setStatus}
+          setTicketType={setTicketType}
+        />
+      }
+
+      {status === "payment" &&
+        <PaymentForm
+          ticketType={ticketType}
+        />
+      }
+
+      {status === "finished" &&
         <FinishedPaymentWrapper>
           <Typo variant="h6" color="#8E8E8E">
-            O pagamento do seu ingresso já foi concluído.<br />
-            Verifique as próximas opções de menu para mais detalhes.
+            O pagamento do seu ingresso foi concluído.<br />
+            Verifique o menu de opções para mais detalhes.
           </Typo>
         </FinishedPaymentWrapper>
       }
