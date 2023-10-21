@@ -23,8 +23,6 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
     } = useTicketTypes();
 
     function handlePrice() {
-
-        console.log(remoteTicketPrice, ticketWithoutHotelPrice, hotelPrice);
         if (modality === "Online") return formatPrice(remoteTicketPrice);
         if (modality === "Presencial") {
             if (haveHotel === "Sem Hotel") return formatPrice(ticketWithoutHotelPrice);
@@ -74,7 +72,6 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
 
     return (
         <StyledTicketAndPayment>
-            <Typo variant="h4">Ingresso e pagamento</Typo>
 
             {!enrollment ? (
                 <VoidContainer>

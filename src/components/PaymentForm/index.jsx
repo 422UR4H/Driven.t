@@ -61,6 +61,7 @@ export default function PaymentForm({ ticketType }) {
 
       const newData = {
         ticketId: ticket.id,
+        price: ticketType.price,
         cardData: {
           issuer,
           number: data.number,
@@ -110,7 +111,6 @@ export default function PaymentForm({ ticketType }) {
 
   return (
     <>
-      <Typo variant="h4">Ingressos e pagamento</Typo>
       <Typo variant="h6" color="#8E8E8E">Ingressos escolhido</Typo>
       <TicketWrapper>
         <div>
