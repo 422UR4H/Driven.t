@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Typo from '../../../components/Dashboard/Content/Typo';
-import { BsPerson, BsFillPersonFill } from 'react-icons/bs';
+import { BsPerson } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import useToken from '../../../hooks/useToken';
@@ -10,6 +10,7 @@ export default function Hotel() {
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [bookingInfo, setBookingInfo] = useState(false);
   const token = useToken();
 
   useEffect(() => {
@@ -43,6 +44,47 @@ export default function Hotel() {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  function booking() {
+    const data = {
+      userId: selectedHotel.id,
+      roomId: selectedRoom.id,
+    };
+
+    axios
+      .post(import.meta.env.VITE_API_URL + '/booking', data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setBookingInfo(true);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  if (bookingInfo) {
+    return (
+      <>
+        <Typo variant="h4">Escolha de hotel e quarto</Typo>
+        <Typo variant="h6" color="#8E8E8E">
+          Você já escolheu seu quarto
+        </Typo>
+        <HotelCard key={selectedHotel.id} selected={true}>
+          <div>
+            <img src={selectedHotel.image} alt="imagem do hotel" />
+            <h2>{selectedHotel.name}</h2>
+            <h4>Quarto Reservado:</h4>
+            <h6>{selectedRoom.name}</h6>
+          </div>
+        </HotelCard>
+        <Button>Trocar de quarto</Button>
+      </>
+    );
   }
 
   return (
@@ -85,6 +127,7 @@ export default function Hotel() {
             </ContainerRooms>
           </>
         )}
+        {selectedRoom && <Button onClick={booking}>RESERVAR QUARTO</Button>}
       </ContainerPai>
     </>
   );
@@ -162,4 +205,14 @@ const HotelCard = styled.div`
     font-weight: 400;
     margin: 0 14px 16px 14px;
   }
+`;
+
+const Button = styled.button`
+  width: 182px;
+  height: 37px;
+  margin: 10px;
+  border-radius: 4px;
+  background: #e0e0e0;
+  border: none;
+  box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
 `;
