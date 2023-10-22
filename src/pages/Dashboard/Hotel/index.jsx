@@ -3,18 +3,24 @@ import Typo from '../../../components/Dashboard/Content/Typo';
 import { BsPerson, BsFillPersonFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import useToken from '../../../hooks/useToken';
 
 export default function Hotel() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
   const [rooms, setRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const token = useToken();
 
   useEffect(() => {
     axios
-      .get(import.meta.env.VITE_API_URL + '/hotels')
+      .get(import.meta.env.VITE_API_URL + '/hotels', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         setHotels(response.data);
-        console.log(response.data);
       })
       .catch((error) => {
         console.log(error);
@@ -23,10 +29,16 @@ export default function Hotel() {
 
   function showRooms(hotel) {
     axios
-      .get(import.meta.env.VITE_API_URL + `/hotels/${hotel.id}`)
+      .get(import.meta.env.VITE_API_URL + `/hotels/${hotel.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
-        setSelectedHotel(response.data);
-        setRooms(response.data);
+        setSelectedHotel(hotel);
+        setRooms([]);
+        setRooms(response.data.Rooms);
+        console.log(response.data.Rooms);
       })
       .catch((error) => {
         console.log(error);
@@ -41,18 +53,8 @@ export default function Hotel() {
       </Typo>
       <ContainerPai>
         <ContainerHotels>
-          <HotelCard>
-            <div>
-              <img src="https://www.cruzeiro.com.br/media/fotos_noticias/17/03/2022/temp_wJELp6V.png" alt="" />
-              <h2>Cruzeiro</h2>
-              <h4>Tipos de acomodação:</h4>
-              <h6>Single e Double</h6>
-              <h4>Vagas disponíveis:</h4>
-              <h6>50</h6>
-            </div>
-          </HotelCard>
           {hotels.map((hotel) => (
-            <HotelCard key={hotel.id} onClick={showRooms} selected={selectedHotel?.id === hotel.id}>
+            <HotelCard key={hotel.id} onClick={() => showRooms(hotel)} selected={selectedHotel?.id === hotel.id}>
               <div>
                 <img src={hotel.image} alt="imagem do hotel" />
                 <h2>{hotel.name}</h2>
@@ -71,10 +73,13 @@ export default function Hotel() {
             </Typo>
             <ContainerRooms>
               {rooms.map((room) => (
-                <RoomCard key={room.id}>
+                <RoomCard key={room.id} selected={selectedRoom?.id === room.id} onClick={() => setSelectedRoom(room)}>
                   <p>{room.name}</p>
-                  <BsPerson />
-                  <BsFillPersonFill />
+                  <div>
+                    {Array.from({ length: room.capacity }).map((_, index) => (
+                      <BsPerson key={index} />
+                    ))}
+                  </div>
                 </RoomCard>
               ))}
             </ContainerRooms>
@@ -99,16 +104,19 @@ const ContainerHotels = styled.div`
 const ContainerRooms = styled.div`
   display: flex;
   margin-top: 15px;
+  flex-wrap: wrap;
 `;
 const RoomCard = styled.div`
   width: 190px;
   height: 45px;
   border-radius: 10px;
   border: 1px solid #cecece;
+  margin: 10px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: ${(props) => (props.selected ? '#FFEED2' : '#ffffff')};
 
   p {
     color: #454545;
@@ -121,7 +129,7 @@ const HotelCard = styled.div`
   width: 196px;
   height: 264px;
   border-radius: 10px;
-  background: #ebebeb;
+  background: ${(props) => (props.selected ? '#FFEED2' : '#ebebeb')};
   font-family: 'Roboto';
 
   img {
