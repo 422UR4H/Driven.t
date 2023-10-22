@@ -21,6 +21,7 @@ import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
 
 export default function PaymentForm({ ticketType }) {
+  const [disableForm, setDisableForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('pending');
   const { createTicket } = useCreateTicket();
   const { paymentProcess } = usePayment();
@@ -50,12 +51,14 @@ export default function PaymentForm({ ticketType }) {
       }
 
       let ticket = null;
+      setDisableForm(true);
 
       try {
         ticket = await createTicket({ ticketTypeId: ticketType.id });
       } catch (err) {
-        console.log(err.response.data.message)
+        console.log(err.response.data.message);
         toast('Não foi possível realizar o pagamento!');
+        setDisableForm(false);
         return;
       }
 
@@ -76,8 +79,9 @@ export default function PaymentForm({ ticketType }) {
         setPaymentStatus('succeed');
         toast('Pagamento efetuado com sucesso!');
       } catch (err) {
-        console.log(err.response.data.message)
+        console.log(err.response.data.message);
         toast('Não foi possível realizar o pagamento!');
+        setDisableForm(false);
       }
     },
 
@@ -170,7 +174,7 @@ export default function PaymentForm({ ticketType }) {
                 {errors.cvv && <ErrorMsg>{errors.cvv}</ErrorMsg>}
               </InputWrapper>
               <SubmitContainer>
-                <Button type="submit">
+                <Button type="submit" disabled={disableForm}>
                   Finalizar Pedido
                 </Button>
               </SubmitContainer>
