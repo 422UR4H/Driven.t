@@ -28,3 +28,34 @@ export async function postBooking(token, data) {
 
   return response.data;
 }
+
+export async function changeBooking(token, data) {
+  const response = await api.put(`/booking/${data.roomId}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
+export async function getBooking(token) {
+  const response = await api.get('/booking', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
+
+
+export async function getHotelsWithAllRooms(token) {
+  const response = await api.get('/hotels/all-with-rooms', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
