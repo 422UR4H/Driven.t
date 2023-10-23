@@ -33,6 +33,7 @@
     "react-toastify": "^7.0.4",
     "react-useinterval": "^1.0.2",
     "styled-components": "^6.1.0",
+    "uuid": "^9.0.1",
     "web-vitals": "^1.1.2"
   },
   "devDependencies": {
