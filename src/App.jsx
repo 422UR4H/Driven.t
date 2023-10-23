@@ -20,6 +20,7 @@ import { EventInfoProvider } from './contexts/EventInfoContext';
 import { UserProvider } from './contexts/UserContext';
 
 import useToken from './hooks/useToken';
+import GeneratedCertificate from './pages/Dashboard/Generated-Certificate';
 
 export default function App() {
   return (
@@ -32,7 +33,7 @@ export default function App() {
               <Route path="/" element={<Countdown />} />
               <Route path="/enroll" element={<Enroll />} />
               <Route path="/sign-in" element={<SignIn />} />
-
+              <Route path="my-certificate" element={<GeneratedCertificate />} />
               <Route
                 path="/dashboard"
                 element={
@@ -41,12 +42,14 @@ export default function App() {
                   </ProtectedRouteGuard>
                 }
               >
+               
                 <Route path="subscription" element={<FillSubscription />} />
                 <Route path="payment" element={<Payment />} />
                 <Route path="hotel" element={<Hotel />} />
                 <Route path="activities" element={<Activities />} />
                 <Route path="certificate" element={<Certificate />} />
                 <Route index path="*" element={<Navigate to="/dashboard/subscription" />} />
+
               </Route>
             </Routes>
           </Router>
