@@ -40,13 +40,20 @@ export async function changeBooking(token, data) {
 }
 
 export async function getBooking(token) {
-  const response = await api.get('/booking', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  api
+    .get('/booking', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(({ data }) => {
+      return data
+    })
+    .catch(err => {
+      if (err.response.status !== 404) console.log(err);
+      return null;
+    });
 
-  return response.data;
 }
 
 

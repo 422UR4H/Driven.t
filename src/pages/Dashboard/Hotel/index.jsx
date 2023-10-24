@@ -28,22 +28,21 @@ export default function Hotel() {
   async function getInfo() {
     setLoading(true);
     try {
-      // const booking = await getBooking(token);
+      const booking = await getBooking(token);
+      console.log(booking)
       const foundHotels = await getHotelsWithAllRooms(token);
       setHotels(foundHotels);
-      // if (booking) {
-      //   setUserHasBooked(true);
-      //   const hotelBooked = foundHotels.find((hotel) => hotel.id === booking.Room.hotelId);
-      //   setSelectedHotel(hotelBooked);
-      //   const roomBooked = hotelBooked.Rooms.find((room) => room.id === booking.Room.id);
-      //   setSelectedRoom(roomBooked);
-      //   setReservedRoom(true);
-      // }
-      // else {
+      if (booking) {
+        setUserHasBooked(true);
+        const hotelBooked = foundHotels.find((hotel) => hotel.id === booking.Room.hotelId);
+        setSelectedHotel(hotelBooked);
+        const roomBooked = hotelBooked.Rooms.find((room) => room.id === booking.Room.id);
+        setSelectedRoom(roomBooked);
+        setReservedRoom(true);
+      } else {
         setUserHasBooked(false);
-      // }
-      setLoading(false);
-    } catch (error) {
+      }
+    } finally {
       setLoading(false);
     }
   }
