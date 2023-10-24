@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components';
 
-export default function HotelCard({ name, image, availableVacancy, roomName, selected = false, ...props }) {
+export default function HotelCard({ name, image, availableVacancy, roomName, selected = false, onClick }) {
     return (
-        <SCHotelCard $selected={selected.toString()} {...props}>
+        <SCHotelCard $selected={selected.toString()} onClick={onClick}>
             <img src={image || '/vite.svg'} alt="imagem do hotel" />
             <h2>{name || 'Hotel name'}</h2>
             <h4>Tipos de acomodação: N/A</h4>
