@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import Typo from '../../../components/Dashboard/Content/Typo';
 import { BsPerson, BsPersonFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import useToken from '../../../hooks/useToken';
 import Loader from 'react-loader-spinner';
 import HotelCard from '../../../components/HotelCard';
 import { postBooking, getBooking, getHotelsWithAllRooms, changeBooking } from '../../../services/hotelApi';
 import { v4 as uuid } from 'uuid';
+
+
 export default function Hotel() {
   const [hotels, setHotels] = useState([]);
   const [selectedHotel, setSelectedHotel] = useState(null);
@@ -27,20 +28,20 @@ export default function Hotel() {
   async function getInfo() {
     setLoading(true);
     try {
-      const booking = await getBooking(token);
+      // const booking = await getBooking(token);
       const foundHotels = await getHotelsWithAllRooms(token);
       setHotels(foundHotels);
-      if (booking) {
-        setUserHasBooked(true);
-        const hotelBooked = foundHotels.find((hotel) => hotel.id === booking.Room.hotelId);
-        setSelectedHotel(hotelBooked);
-        const roomBooked = hotelBooked.Rooms.find((room) => room.id === booking.Room.id);
-        setSelectedRoom(roomBooked);
-        setReservedRoom(true);
-      }
-      else {
+      // if (booking) {
+      //   setUserHasBooked(true);
+      //   const hotelBooked = foundHotels.find((hotel) => hotel.id === booking.Room.hotelId);
+      //   setSelectedHotel(hotelBooked);
+      //   const roomBooked = hotelBooked.Rooms.find((room) => room.id === booking.Room.id);
+      //   setSelectedRoom(roomBooked);
+      //   setReservedRoom(true);
+      // }
+      // else {
         setUserHasBooked(false);
-      }
+      // }
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -189,7 +190,7 @@ export default function Hotel() {
                     <RoomCard
                       $disabled={(getAvailableVacancyOfRoom(room) === 0).toString()}
                       key={room.id}
-                      selected={selectedRoom?.id === room.id}
+                      $selected={selectedRoom?.id === room.id}
                       onClick={() => {
                         if (getAvailableVacancyOfRoom(room) !== 0) {
                           setSelectedRoom(room);
@@ -250,7 +251,7 @@ const RoomCard = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: ${(props) => (props.selected ? '#FFEED2' : '#ffffff')};
+  background: ${(props) => (props.$selected ? '#FFEED2' : '#ffffff')};
   opacity: ${(props) => (props.$disabled == 'true' ? '0.5' : '1')};
   cursor: ${(props) => (props.$disabled == 'true' ? 'not-allowed' : 'pointer')};
   &:hover{
