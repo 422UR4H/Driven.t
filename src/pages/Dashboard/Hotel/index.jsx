@@ -46,23 +46,28 @@ export default function Hotel() {
     }
   }
 
+  useEffect(() => {
+    updateVacancy();
+  }, [selectedRoom]);
+
+  async function updateVacancy() {
+    console.log('update');
+  }
+
   async function reserveRoom() {
     if (creatingBooking) return;
     setCreatingBooking(true);
     setReservedRoom(true);
     if (userHasBooked) {
       await changeBooking(token, { roomId: selectedRoom.id });
-      const hg = await getHotelsWithAllRooms(token);
-      const rb = hg.find((hotel) => hotel.id === selectedHotel.id).Rooms.find((room) => room.id === selectedRoom.id);
-      setSelectedRoom(rb);
-      setHotels(hg);
     } else {
       await postBooking(token, { roomId: selectedRoom.id });
-      const ht = await getHotelsWithAllRooms(token);
-      const rc = ht.find((hotel) => hotel.id === selectedHotel.id).Rooms.find((room) => room.id === selectedRoom.id);
-      setSelectedRoom(rc);
-      setHotels(ht);
     }
+    const hg = await getHotelsWithAllRooms(token);
+    console.log(hg)
+    const rb = hg.find((hotel) => hotel.id === selectedHotel.id).Rooms.find((room) => room.id === selectedRoom.id);
+    setSelectedRoom(rb);
+    setHotels(hg);
     setCreatingBooking(false);
     setInChangeMode(false);
   }
