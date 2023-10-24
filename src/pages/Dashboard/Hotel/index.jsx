@@ -29,7 +29,6 @@ export default function Hotel() {
     setLoading(true);
     try {
       const booking = await getBooking(token);
-      console.log(booking)
       const foundHotels = await getHotelsWithAllRooms(token);
       setHotels(foundHotels);
       if (booking) {
