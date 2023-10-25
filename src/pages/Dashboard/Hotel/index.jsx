@@ -67,37 +67,20 @@ export default function Hotel() {
     setInChangeMode(false);
   }
 
-  async function enterChangeRoomMode() {
+  async function enterChangeRoomMode(id) {
     if (creatingBooking) return;
     setGettingNewHotels(true);
-    const hg = await getHotelsWithAllRooms(token);
-    setHotels(hg);
+    const newHotelList = await getHotelsWithAllRooms(token);
+    const newSelectedHotel = newHotelList.find((hotel) => hotel.id === id);
+    setSelectedHotel(newSelectedHotel);
+    setHotels(newHotelList);
     setReservedRoom(null);
     setSelectedRoom(null);
     setInChangeMode(true);
     setGettingNewHotels(false);
   }
 
-  if (selectedHotel && selectedRoom && reservedRoom) {
-    return (
-      <>
-        <Typo variant="h4">Escolha de hotel e quarto</Typo>
-        <Typo variant="h6" color="#8E8E8E">
-          Você já escolheu seu quarto
-        </Typo>
-        <HotelCard
-          selected={true}
-          name={selectedHotel.name}
-          image={selectedHotel.image}
-          room={selectedRoom.name}
-          availableVacancy={getAvailableVacancy(selectedHotel.Rooms)}
-        />
-        <Button disabled={creatingBooking || gettingNewHotels} onClick={enterChangeRoomMode}>
-          {creatingBooking || gettingNewHotels ? 'Aguarde..' : 'Trocar de quarto'}
-        </Button>
-      </>
-    );
-  }
+
 
   function getAvailableVacancy(rooms) {
     if (!rooms) return 0;
@@ -117,6 +100,7 @@ export default function Hotel() {
     return room.capacity - room.Booking.length;
   }
   function getVacancyIcons(room, selected = false) {
+    console.log("Changed vanacy icons");
     let occupiedIcons = [];
     let emptyIcons = [];
     for (let index = 0; index < room.Booking.length; index++) {
@@ -139,6 +123,26 @@ export default function Hotel() {
     ));
   }
 
+  if (selectedHotel && selectedRoom && reservedRoom) {
+    return (
+      <>
+        <Typo variant="h4">Escolha de hotel e quarto</Typo>
+        <Typo variant="h6" color="#8E8E8E">
+          Você já escolheu seu quarto
+        </Typo>
+        <HotelCard
+          selected={true}
+          name={selectedHotel.name}
+          image={selectedHotel.image}
+          room={selectedRoom.name}
+          availableVacancy={getAvailableVacancy(selectedHotel.Rooms)}
+        />
+        <Button disabled={creatingBooking || gettingNewHotels} onClick={() => enterChangeRoomMode(selectedHotel.id)}>
+          {creatingBooking || gettingNewHotels ? 'Aguarde..' : 'Trocar de quarto'}
+        </Button>
+      </>
+    );
+  }
 
   return (
     <>
