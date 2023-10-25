@@ -11,7 +11,7 @@ export default function useTicketTypes() {
     loading: ticketTypesLoading,
     error: ticketTypesError,
     act: ticketTypesProcess
-  } = useAsync(() => ticketApi.getTicketTypes(token), false); // IF ERROR -> TOGGLE BY TRUE
+  } = useAsync(() => ticketApi.getTicketTypes(token), true);
 
   return {
     ticketTypes,

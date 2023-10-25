@@ -4,38 +4,63 @@ import PaymentForm from '../../../components/PaymentForm';
 import TicketAndPayment from '../../../components/TicketAndPayment/TicketAndPayment';
 import { useGetTicket } from '../../../hooks/api/useTicket';
 import Typo from "../../../components/Dashboard/Content/Typo";
+import Loader from 'react-loader-spinner';
+import useTicketTypes from '../../../hooks/api/useTicketTypes.js';
+import useEnrollment from '../../../hooks/api/useEnrollment.js';
 
 export default function Payment() {
   const [status, setStatus] = useState("pending");
-  const [ticketType, setTicketType] = useState(undefined);
-  const { getTicket } = useGetTicket();
+  const { enrollment, enrollmentLoading } = useEnrollment();
+  const { getTicket, ticketLoading } = useGetTicket();
+  const {
+      ticketTypes,
+      ticketTypesProcess,
+      ticketTypesLoading
+  } = useTicketTypes();
 
   useEffect(() => {
-
     const fetchData = async () => {
-  
       const ticket = await getTicket();
       if (ticket && status !== "finished") setStatus("finished");
+      await ticketTypesProcess();
     };
-
     fetchData();
-
   }, [status]);
+
+  function isLoading() {
+    return ticketLoading || ticketTypesLoading || enrollmentLoading;
+  }
 
   return (
     <>
       <Typo variant="h4">Ingressos e pagamento</Typo>
 
-      {status === "pending" &&
-        <TicketAndPayment 
+      {isLoading() &&
+        <StyledLoader>
+          <Loader
+            height="100"
+            width="100"
+            color="#FF4791"
+            secondaryColor='#FFD77F'
+            radius='12.5'
+            ariaLabel="mutating-dots-loading"
+            visible={true}
+          />
+        </StyledLoader>
+      }
+
+      {(status === "pending" && !isLoading()) &&
+        <TicketAndPayment
           setStatus={setStatus}
-          setTicketType={setTicketType}
+          setTicketType={ticketTypesProcess}
+          ticketTypes={ticketTypes}
+          hasEnrollment={!!enrollment}
         />
       }
 
       {status === "payment" &&
         <PaymentForm
-          ticketType={ticketType}
+          ticketType={ticketTypes}
         />
       }
 
@@ -58,4 +83,10 @@ const FinishedPaymentWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+`;
+
+const StyledLoader = styled.div`
+  margin-top: 25%;
+  margin-right: 5%;
+  text-align: center;
 `;
