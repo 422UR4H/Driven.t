@@ -3,14 +3,13 @@ import Loader from 'react-loader-spinner';
 import styled from 'styled-components';
 import Typo from './Dashboard/Content/Typo.jsx';
 
-export default function DefaultLoader(visible = true) {
+export default function DefaultLoader() {
   return (
     <StyledLoader>
       <Loader
         height="100"
         width="100"
         color="#FF4791"
-        visible={visible}
       />
       <Typo variant="h6" color="#8E8E8E">Carregando informações...</Typo>
     </StyledLoader>

@@ -78,7 +78,7 @@ export default function Certificate() {
             </StupidMUI>
 
             :
-            enrollmentError || ticketError ?
+            (enrollmentError || ticketError) ?
               <>
                 <Typo variant="h6" color="#8E8E8E">Erro ao carregar informações</Typo>
               </>
