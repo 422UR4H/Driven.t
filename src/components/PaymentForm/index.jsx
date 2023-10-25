@@ -94,7 +94,6 @@ export default function PaymentForm({ ticketType }) {
   });
 
   useEffect(() => {
-    console.log(ticketType)
     if (!ticketType) return;
   }, []);
 
