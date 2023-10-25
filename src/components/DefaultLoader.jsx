@@ -1,19 +1,18 @@
 import React from 'react'
 import Loader from 'react-loader-spinner';
 import styled from 'styled-components';
+import Typo from './Dashboard/Content/Typo.jsx';
 
-export default function DefaultLoader() {
+export default function DefaultLoader(visible = true) {
   return (
     <StyledLoader>
       <Loader
         height="100"
         width="100"
         color="#FF4791"
-        secondaryColor='#FFD77F'
-        radius='12.5'
-        ariaLabel="mutating-dots-loading"
-        visible={true}
+        visible={visible}
       />
+      <Typo variant="h6" color="#8E8E8E">Carregando informações...</Typo>
     </StyledLoader>
   );
 }
