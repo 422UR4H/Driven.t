@@ -100,7 +100,6 @@ export default function Hotel() {
     return room.capacity - room.Booking.length;
   }
   function getVacancyIcons(room, selected = false) {
-    console.log("Changed vanacy icons");
     let occupiedIcons = [];
     let emptyIcons = [];
     for (let index = 0; index < room.Booking.length; index++) {
