@@ -7,6 +7,7 @@ import Loader from 'react-loader-spinner';
 import HotelCard from '../../../components/HotelCard';
 import { postBooking, getBooking, getHotelsWithAllRooms, changeBooking } from '../../../services/hotelApi';
 import { v4 as uuid } from 'uuid';
+import DefaultLoader from '../../../components/DefaultLoader.jsx';
 
 
 export default function Hotel() {
@@ -80,8 +81,6 @@ export default function Hotel() {
     setGettingNewHotels(false);
   }
 
-
-
   function getAvailableVacancy(rooms) {
     if (!rooms) return 0;
     let availableVacancy = 0;
@@ -91,14 +90,17 @@ export default function Hotel() {
     });
     return availableVacancy;
   }
+
   function getAvailableVacancyOfRoom(room) {
     if (!room) return 0;
     return room.capacity - room.Booking.length;
   }
+
   function getAvailableVacancyOfRoom(room) {
     if (!room) return 0;
     return room.capacity - room.Booking.length;
   }
+
   function getVacancyIcons(room, selected = false) {
     let occupiedIcons = [];
     let emptyIcons = [];
@@ -112,14 +114,11 @@ export default function Hotel() {
     if (occupiedIcons.length > 0) {
       occupiedIcons[0] = <BsPersonFill style={{ color: '#FF4791' }} key={`${uuid()}-fill`} />;
     }
-
     if (emptyIcons.length > 0 && selected) {
       emptyIcons[0] = <BsPersonFill style={{ color: '#ffd380' }} key={`${uuid()}-fill`} />;
     }
     const icons = [...occupiedIcons, ...emptyIcons]
-    return icons.map((icon) => (
-      icon
-    ));
+    return icons.map((icon) => (icon));
   }
 
   if (selectedHotel && selectedRoom && reservedRoom) {
@@ -166,20 +165,8 @@ export default function Hotel() {
                 />
               ))}
             </ContainerHotels>
-            {
-              loading && !inChangeMode &&
-              <StupidMUI>
-                <Loader
-                  height="100"
-                  width="100"
-                  color="#FF4791"
-                  secondaryColor='#FFD77F'
-                  radius='12.5'
-                  ariaLabel="mutating-dots-loading"
-                  visible={true}
-                />
-                <Typo variant="h6" color="#8E8E8E">Carregando informações...</Typo>
-              </StupidMUI>
+            {(loading && !inChangeMode) &&
+              <DefaultLoader />
             }
             {selectedHotel && (
               <>
