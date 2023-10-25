@@ -13,6 +13,16 @@ export default function TicketAndPayment({ setStatus, setTicketType, ticketTypes
     const [remoteTicketPrice, setRemoteTicketPrice] = useState(undefined);
     const [ticketWithoutHotelPrice, setTicketWithoutHotelPrice] = useState(undefined);
 
+    useEffect(() => {
+        if (ticketTypes && ticketTypes?.length > 0) {
+            const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
+            const priceWithHotel = ticketTypes.find(t => !t.isRemote && t.includesHotel).price;
+            setTicketWithoutHotelPrice(priceWithoutHotel);
+            setHotelPrice(Math.abs(priceWithHotel - priceWithoutHotel))
+            setRemoteTicketPrice(ticketTypes.find(t => t.isRemote).price);
+        }
+    }, [ticketTypes]);
+
     function handlePrice() {
         if (modality === "Online") return formatPrice(remoteTicketPrice);
         if (modality === "Presencial") {
@@ -30,16 +40,6 @@ export default function TicketAndPayment({ setStatus, setTicketType, ticketTypes
         const includesHotel = haveHotel === "Com Hotel";
         return ticketTypes.find(t => t.includesHotel === includesHotel && t.isRemote === false);
     }
-
-    useEffect(() => {
-        if (ticketTypes && ticketTypes?.length > 0) {
-            const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
-            const priceWithHotel = ticketTypes.find(t => !t.isRemote && t.includesHotel).price;
-            setTicketWithoutHotelPrice(priceWithoutHotel);
-            setHotelPrice(Math.abs(priceWithHotel - priceWithoutHotel))
-            setRemoteTicketPrice(ticketTypes.find(t => t.isRemote).price);
-        }
-    }, [ticketTypes]);
 
     async function handleClick() {
         const ticketType = handleUserTicket();
