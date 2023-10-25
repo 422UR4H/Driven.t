@@ -1,26 +1,17 @@
 import { useEffect, useState } from "react";
 import Typo from "../Dashboard/Content/Typo.jsx";
 import TicketContainer from "./TicketContainer.jsx";
-import useEnrollment from "../../hooks/api/useEnrollment.js";
 import styled from "styled-components";
 import ReserveTicket from "./ReserveTicket.jsx";
-import useTicketTypes from "../../hooks/api/useTicketTypes.js";
-
 import { formatPrice } from "../../utils/formatPrice.js";
 
-export default function TicketAndPayment({ setStatus, setTicketType }) {
-    const { enrollment } = useEnrollment();
+
+export default function TicketAndPayment({ setStatus, setTicketType, ticketTypes, hasEnrollment }) {
     const [modality, setModality] = useState(undefined);
     const [haveHotel, setHaveHotel] = useState(undefined);
     const [hotelPrice, setHotelPrice] = useState(undefined);
     const [remoteTicketPrice, setRemoteTicketPrice] = useState(undefined);
     const [ticketWithoutHotelPrice, setTicketWithoutHotelPrice] = useState(undefined);
-    const {
-        ticketTypes,
-        ticketTypesProcess,
-        ticketTypesLoading,
-        ticketTypesError
-    } = useTicketTypes();
 
     function handlePrice() {
         if (modality === "Online") return formatPrice(remoteTicketPrice);
@@ -40,15 +31,6 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
         return ticketTypes.find(t => t.includesHotel === includesHotel && t.isRemote === false);
     }
 
-    async function instanceTicketTypes() {
-        await ticketTypesProcess();
-    }
-
-    useEffect(() => {
-        instanceTicketTypes();
-        // if (ticketTypesError) // FIXME: finish this
-    }, [ticketTypesError]);
-
     useEffect(() => {
         if (ticketTypes && ticketTypes?.length > 0) {
             const priceWithoutHotel = ticketTypes.find(t => !t.isRemote && !t.includesHotel).price;
@@ -60,12 +42,10 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
     }, [ticketTypes]);
 
     async function handleClick() {
-
         const ticketType = handleUserTicket();
         if (!ticketType.isRemote && ticketType.includesHotel) {
             ticketType.price = ticketWithoutHotelPrice + hotelPrice;
         }
-
         setTicketType(ticketType);
         setStatus("payment");
     }
@@ -73,7 +53,7 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
     return (
         <StyledTicketAndPayment>
 
-            {!enrollment ? (
+            {!hasEnrollment ? (
                 <VoidContainer>
                     <Typo variant="h6" color="#8E8E8E">
                         Você precisa completar sua inscrição antes<br />
@@ -87,7 +67,7 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
                     <TicketContainer
                         text1="Presencial"
                         text2="Online"
-                        price1={"R$ " + formatPrice(ticketWithoutHotelPrice)} // FIXME: formatPrice and toPrecision
+                        price1={"R$ " + formatPrice(ticketWithoutHotelPrice)}
                         price2={"R$ " + formatPrice(remoteTicketPrice)}
                         option={modality}
                         setOption={setModality}
@@ -117,16 +97,13 @@ export default function TicketAndPayment({ setStatus, setTicketType }) {
     );
 }
 
-// FIXME: finish this
 const StyledTicketAndPayment = styled.div`
-    /* .test {
-        margin-top: 100px;
-    } */
+    height: 90%;
 `;
 
 const VoidContainer = styled.div`
     text-align: center;
-    height: 80%;
+    height: inherit;
 
     display: flex;
     align-items: center;
