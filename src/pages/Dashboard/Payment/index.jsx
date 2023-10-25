@@ -36,30 +36,27 @@ export default function Payment() {
     <>
       <Typo variant="h4">Ingressos e pagamento</Typo>
 
-      {isLoading() && <DefaultLoader />}
+      {isLoading() ?
+        <DefaultLoader /> :
 
-      {(status === "pending" && !isLoading()) &&
-        <TicketAndPayment
-          setStatus={setStatus}
-          setTicketType={setTicketType}
-          ticketTypes={ticketTypes}
-          hasEnrollment={!!enrollment}
-        />
-      }
-
-      {(status === "payment" && !isLoading()) &&
-        <PaymentForm
-          ticketType={ticketType}
-        />
-      }
-
-      {status === "finished" &&
-        <FinishedPaymentWrapper>
-          <Typo variant="h6" color="#8E8E8E">
-            O pagamento do seu ingresso foi concluído.<br />
-            Verifique o menu de opções para mais detalhes.
-          </Typo>
-        </FinishedPaymentWrapper>
+        status === "pending" ?
+          <TicketAndPayment
+            setStatus={setStatus}
+            setTicketType={setTicketType}
+            ticketTypes={ticketTypes}
+            hasEnrollment={!!enrollment}
+          /> :
+          status === "payment" ?
+            <PaymentForm
+              ticketType={ticketType}
+            /> :
+            status === "finished" &&
+            <FinishedPaymentWrapper>
+              <Typo variant="h6" color="#8E8E8E">
+                O pagamento do seu ingresso foi concluído.<br />
+                Verifique o menu de opções para mais detalhes.
+              </Typo>
+            </FinishedPaymentWrapper>
       }
     </>
   );

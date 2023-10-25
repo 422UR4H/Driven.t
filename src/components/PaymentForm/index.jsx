@@ -18,9 +18,11 @@ import FormValidations from './FormValidations';
 import { formatPrice } from '../../utils/formatPrice.js';
 import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
+import Loader from 'react-loader-spinner';
 
 
 export default function PaymentForm({ ticketType }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [disableForm, setDisableForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('pending');
   const { createTicket } = useCreateTicket();
@@ -52,6 +54,7 @@ export default function PaymentForm({ ticketType }) {
 
       let ticket = null;
       setDisableForm(true);
+      setIsLoading(true);
 
       try {
         ticket = await createTicket({ ticketTypeId: ticketType.id });
@@ -59,6 +62,7 @@ export default function PaymentForm({ ticketType }) {
         console.log(err.response.data.message);
         toast('Não foi possível realizar o pagamento!');
         setDisableForm(false);
+        setIsLoading(false);
         return;
       }
 
@@ -82,6 +86,8 @@ export default function PaymentForm({ ticketType }) {
         console.log(err.response.data.message);
         toast('Não foi possível realizar o pagamento!');
         setDisableForm(false);
+      } finally {
+        setIsLoading(false);
       }
     },
 
@@ -98,7 +104,7 @@ export default function PaymentForm({ ticketType }) {
   }, []);
 
   function formatTicketMessage() {
-    
+
     let message = '';
     if (ticketType.isRemote) {
       message += 'Online';
@@ -115,13 +121,23 @@ export default function PaymentForm({ ticketType }) {
 
   return (
     <>
-      <Typo variant="h6" color="#8E8E8E">Ingressos escolhido</Typo>
-      <TicketWrapper>
+      <TopWrapper>
         <div>
-          <Typo variant="h6">{ticketMessage}</Typo>
-          <Typo variant="body1" color="#8E8E8E">R$ {formatPrice(ticketType.price)}</Typo>
+          <Typo variant="h6" color="#8E8E8E">Ingresso escolhido</Typo>
+          <TicketWrapper>
+            <div>
+              <Typo variant="h6">{ticketMessage}</Typo>
+              <Typo variant="body1" color="#8E8E8E">R$ {formatPrice(ticketType.price)}</Typo>
+            </div>
+          </TicketWrapper>
         </div>
-      </TicketWrapper>
+        <Loader
+          className="three-dots-loading"
+          height="190"
+          color="#FF4791"
+          visible={isLoading}
+        />
+      </TopWrapper>
       <Typo variant="h6" color="#8E8E8E">Pagamento</Typo>
       <PaymentWrapper>
         {paymentStatus === 'pending' &&
@@ -202,5 +218,27 @@ const SubmitContainer = styled.div`
   @media (max-width: 750px) {
     display: flex;
     justify-content: center;
+  }
+`;
+
+const TopWrapper = styled.div`
+  display: flex;
+
+  .three-dots-loading {
+    margin-left: 56px;
+    width: 56%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  @media (max-width: 750px) {
+    flex-direction: column;
+    width: 100%;
+    margin: auto;
+
+    .three-dots-loading {
+      width: 100%;
+      margin: auto;
+    }
   }
 `;
