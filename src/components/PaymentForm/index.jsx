@@ -16,9 +16,9 @@ import Button from '../Form/Button';
 import usePayment from '../../hooks/api/usePayment';
 import FormValidations from './FormValidations';
 import { formatPrice } from '../../utils/formatPrice.js';
-
 import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
+
 
 export default function PaymentForm({ ticketType }) {
   const [disableForm, setDisableForm] = useState(false);
@@ -94,6 +94,7 @@ export default function PaymentForm({ ticketType }) {
   });
 
   useEffect(() => {
+    console.log(ticketType)
     if (!ticketType) return;
   }, []);
 

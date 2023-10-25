@@ -4,18 +4,19 @@ import PaymentForm from '../../../components/PaymentForm';
 import TicketAndPayment from '../../../components/TicketAndPayment/TicketAndPayment';
 import { useGetTicket } from '../../../hooks/api/useTicket';
 import Typo from "../../../components/Dashboard/Content/Typo";
-import Loader from 'react-loader-spinner';
 import useTicketTypes from '../../../hooks/api/useTicketTypes.js';
 import useEnrollment from '../../../hooks/api/useEnrollment.js';
+import DefaultLoader from '../../../components/DefaultLoader.jsx';
 
 export default function Payment() {
+  const [ticketType, setTicketType] = useState();
   const [status, setStatus] = useState("pending");
   const { enrollment, enrollmentLoading } = useEnrollment();
   const { getTicket, ticketLoading } = useGetTicket();
   const {
-      ticketTypes,
-      ticketTypesProcess,
-      ticketTypesLoading
+    ticketTypes,
+    ticketTypesProcess,
+    ticketTypesLoading
   } = useTicketTypes();
 
   useEffect(() => {
@@ -35,32 +36,20 @@ export default function Payment() {
     <>
       <Typo variant="h4">Ingressos e pagamento</Typo>
 
-      {isLoading() &&
-        <StyledLoader>
-          <Loader
-            height="100"
-            width="100"
-            color="#FF4791"
-            secondaryColor='#FFD77F'
-            radius='12.5'
-            ariaLabel="mutating-dots-loading"
-            visible={true}
-          />
-        </StyledLoader>
-      }
+      {isLoading() && <DefaultLoader />}
 
       {(status === "pending" && !isLoading()) &&
         <TicketAndPayment
           setStatus={setStatus}
-          setTicketType={ticketTypesProcess}
+          setTicketType={setTicketType}
           ticketTypes={ticketTypes}
           hasEnrollment={!!enrollment}
         />
       }
 
-      {status === "payment" &&
+      {(status === "payment" && !isLoading()) &&
         <PaymentForm
-          ticketType={ticketTypes}
+          ticketType={ticketType}
         />
       }
 
@@ -83,10 +72,4 @@ const FinishedPaymentWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const StyledLoader = styled.div`
-  margin-top: 25%;
-  margin-right: 5%;
-  text-align: center;
 `;
