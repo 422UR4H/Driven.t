@@ -3,7 +3,6 @@ import Typo from '../../../components/Dashboard/Content/Typo';
 import { BsPerson, BsPersonFill } from 'react-icons/bs';
 import { useEffect, useState } from 'react';
 import useToken from '../../../hooks/useToken';
-import Loader from 'react-loader-spinner';
 import HotelCard from '../../../components/HotelCard';
 import { postBooking, getBooking, getHotelsWithAllRooms, changeBooking } from '../../../services/hotelApi';
 import { v4 as uuid } from 'uuid';
