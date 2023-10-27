@@ -10,7 +10,10 @@ export default function Activities() {
   return (
     <>
       <Typo variant="h4">Escolha de atividades</Typo>
-      <SelectDay setSelectedDay={setSelectedDay} />
+      <SelectDay
+        selectedDay={selectedDay}
+        setSelectedDay={setSelectedDay}
+      />
       {selectedDay &&
         <SelectActivity selectedDay={selectedDay} />
       }

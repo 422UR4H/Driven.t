@@ -6,7 +6,7 @@ import Button from '../Form/Button';
 import Typo from '../Dashboard/Content/Typo';
 import formatDayMessage from '../../utils/formatDayMessage';
 
-export default function SelectDay({ setSelectedDay }) {
+export default function SelectDay({ selectedDay, setSelectedDay }) {
 
   const { activitiesDay } = useActivitiesDay();
 
@@ -22,23 +22,26 @@ export default function SelectDay({ setSelectedDay }) {
 
   return (
     <>
-      <TopWrapper>
+      <Wrapper>
         <div>
           <Typo variant="h6" color="#8E8E8E">Primeiro, filtre pelo dia do evento:</Typo>
           <ActivitiesWrapper>
-            {activitiesDay.map((activityDay) => (
-              <div key={activityDay.id}>
-                <Button onClick={() => selectDay(activityDay.id)}>{formatDayMessage(activityDay.startsAt)}</Button>
-              </div>
-            ))}
+            {activitiesDay.map((activityDay) => {
+              const selectedButton = (selectedDay === activityDay.id);
+              return (
+                <Content key={activityDay.id} $selectedButton={selectedButton}>
+                  <Button onClick={() => selectDay(activityDay.id)}>{formatDayMessage(activityDay.startsAt)}</Button>
+                </Content>
+              )})
+            }
           </ActivitiesWrapper>
         </div>
-      </TopWrapper>
+      </Wrapper>
     </>
   )
 }
 
-const TopWrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
 
   > div {
@@ -49,5 +52,12 @@ const TopWrapper = styled.div`
     flex-direction: column;
     width: 100%;
     margin: auto;
+  }
+`;
+
+const Content = styled.div`
+
+  > button {
+    background-color: ${(props) => (props.$selectedButton) ? '#FFD37D !important' : 'inherit'} 
   }
 `;
