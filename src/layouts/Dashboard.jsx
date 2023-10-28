@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import Page from '../components/Page';
 import { StyledContainer as Container } from '../components/Auth';
 
-export default function Dashboard({ background, children }) {
+export default function Dashboard({ background, children, ...props }) {
   return (
     <Page $background={background}>
-      <StyledContainer width="1040px" height="680px">
+      <StyledContainer  {...props} width="1040px" height="680px">
         {children}
       </StyledContainer>
     </Page>
