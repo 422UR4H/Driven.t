@@ -56,6 +56,9 @@ export default function AdministrationPage() {
         if(!localStorage.getItem('admin')){
             return navigate('/sign-in');
         }
+        if(!localStorage.getItem('token')){
+            return navigate('/sign-in');
+        }
     }, []);
     useEffect(() => {
         if (event) {
