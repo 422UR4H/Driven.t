@@ -31,6 +31,7 @@ export default function SignIn() {
 
   const navigate = useNavigate();
   function adminLogin(){
+    if(!localStorage.getItem('userData')) return alert('Você não tem permissão para acessar essa página, cadastre-se como usuário, retorne a pagina inicial e clique em "Sou admin" novamente!');
     if(window.prompt('Digite a senha de admin') === import.meta.env.VITE_ADMIN_PASSWORD){
       localStorage.setItem('admin', true);
       navigate('/admin');
