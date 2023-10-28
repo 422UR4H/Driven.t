@@ -18,6 +18,7 @@ import { getGithubAccessToken, getGithubUserInfo, signUpWithGithub } from '../..
 import { scrambleEmail } from '../../utils/passwordGenerator';
 import { BsGithub } from 'react-icons/bs';
 import GithubButton from '../../components/Form/GithubButton';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -29,7 +30,12 @@ export default function SignIn() {
   const { setUserData } = useContext(UserContext);
 
   const navigate = useNavigate();
-
+  function adminLogin(){
+    if(window.prompt('Digite a senha de admin') === import.meta.env.VITE_ADMIN_PASSWORD){
+      localStorage.setItem('admin', true);
+      navigate('/admin');
+    }
+  }
   useEffect(() => {
     (async () => {
       const queryString = window.location.search;
@@ -104,6 +110,7 @@ export default function SignIn() {
           <Input label="Senha" type="password" fullWidth value={password} onChange={e => setPassword(e.target.value)} />
           <Button type="submit" color="primary" fullWidth disabled={loadingSignIn}>Entrar</Button>
           <GithubButton type="button" disabled={loadingSignIn} onClick={() => loginWithGithub()}><BsGithub />Entrar com Github</GithubButton>
+          <GithubButton type="button" disabled={loadingSignIn} onClick={() => adminLogin()}><MdAdminPanelSettings />Sou admin</GithubButton>
         </form>
        
       </Row>
