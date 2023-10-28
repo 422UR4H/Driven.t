@@ -17,6 +17,7 @@ import { getHotelsWithAllRooms } from '../../../services/hotelApi';
 import HotelCard from '../../../components/HotelCard';
 import { v4 as uuid } from 'uuid';
 import { formatPrice } from '../../../utils/formatPrice';
+import { useNavigate } from 'react-router-dom';
 
 
 const State = {
@@ -33,59 +34,12 @@ const TicketMock = {
     includesHotel: true
 }
 
-const HotelsMock = [
-    {
-        name: "Hotel Name",
-        image: "https://images.unsplash.com/photo-1525253086316-1a2e0cddc4e8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3JmdWwlMjBwcm9qZWN0fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80",
-        Rooms: [
-            {
-                id: 1,
-                name: "Room Naaaadfffffffaaaame",
-                capacity: 10,
-                Booking: []
-            },
-            {
-                id: 2,
-                name: "Room dddd",
-                capacity: 5,
-                Booking: [1, 2, 3]
-            },
-            {
-                id: 3,
-                name: "Room ABC",
-                capacity: 2,
-                Booking: [1, 2]
-            }
-        ]
-    },
-
-    {
-        name: "Hotel Name2",
-        image: "https://images.unsplash.com/photo-1525253086316-1a2e0cddc4e8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y29sb3JmdWwlMjBwcm9qZWN0fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80",
-        Rooms: [
-            {
-                id: 1,
-                name: "Room TATA",
-                capacity: 15,
-                Booking: [1, 2, 3]
-            },
-            {
-                id: 2,
-                name: "Room Test",
-                capacity: 7,
-                Booking: [1, 2, 3]
-            },
-        ]
-    },
-
-]
-
 const DEFAULT_TICKET = { id: 0, name: '', price: 0, isRemote: false, includesHotel: false };
 
 export default function AdministrationPage() {
     const [eventData, setEventData] = useState(null);
     const [tickets, setTickets] = useState([TicketMock]);
-    const [hotels, setHotels] = useState(HotelsMock);
+    const [hotels, setHotels] = useState(null);
     const [activities, setActivities] = useState(null);
     const [state, setState] = useState(State.event);
     const { event, eventError, eventLoading } = useEvent();
@@ -96,9 +50,18 @@ export default function AdministrationPage() {
     const [editingHotel, setEditingHotel] = useState(false);
     const [currentHotelFormInfo, setCurrentHotelFormInfo] = useState(null);
     const token = useToken();
+    const navigate = useNavigate();
     useEffect(() => {
         getHotelsInfo();
+        if(!localStorage.getItem('admin')){
+            return navigate('/sign-in');
+        }
     }, []);
+    useEffect(() => {
+        if (event) {
+            setEventData({ ...event, startsAt: event.startsAt.split('T')[0], endsAt: event.endsAt.split('T')[0] });
+        }
+    }, [event]);
 
     async function getHotelsInfo() {
         setHotelsLoading(true);
@@ -111,19 +74,16 @@ export default function AdministrationPage() {
             setHotelsLoading(false);
         }
     }
-
     function startEditingHotel(hotel) {
         setEditingHotel(true);
         setCurrentHotelFormInfo(hotel);
     }
-
     function increaseRoomInCurrentEditingHotel() {
         setCurrentHotelFormInfo({ ...currentHotelFormInfo, Rooms: [...currentHotelFormInfo.Rooms, { id: uuid(), name: '', capacity: 0, Booking: [] }] });
     }
     function removeRoomInCurrentEditingHotel(roomId) {
         setCurrentHotelFormInfo({ ...currentHotelFormInfo, Rooms: currentHotelFormInfo.Rooms.filter((room) => room.id !== roomId) });
     }
-
     function saveHotelEdition() {
         const data = currentHotelFormInfo;
         data.Rooms = data.Rooms.map((room) => {
@@ -146,18 +106,8 @@ export default function AdministrationPage() {
         }).catch((err) => {
             console.log(err);
         })
-        // {
-        //              id: number,
-        //         name: string,
-        //         image: string,
-        //         rooms: {
-        //         name:string;
-        //         capacity:number;
-        //     } []
-        // }
         cancelHotelEdition();
     }
-
     function updateObject(roomId, newValue, key) {
         const updatedData = currentHotelFormInfo.Rooms.map(room => {
             if (room.id === roomId) {
@@ -169,7 +119,6 @@ export default function AdministrationPage() {
 
         setCurrentHotelFormInfo({ ...currentHotelFormInfo, Rooms: updatedData });
     }
-
     function cancelHotelEdition() {
         setEditingHotel(false);
         setCurrentHotelFormInfo({
@@ -179,13 +128,6 @@ export default function AdministrationPage() {
             rooms: []
         });
     }
-
-    useEffect(() => {
-        if (event) {
-            setEventData({ ...event, startsAt: event.startsAt.split('T')[0], endsAt: event.endsAt.split('T')[0] });
-        }
-    }, [event]);
-
     function startEditingTicket(ticket) {
         setEditingTicket(true);
         setCurrentTicket({
@@ -196,9 +138,7 @@ export default function AdministrationPage() {
             includesHotel: ticket.includesHotel
         });
     }
-
     function saveTicketEdition() {
-
         axios.put('http://localhost:4000/tickets/types', currentTicket, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -216,12 +156,10 @@ export default function AdministrationPage() {
             setEditingTicket(false);
         })
     }
-
     function cancelTicketEdition() {
         setEditingTicket(false);
         setCurrentTicket(DEFAULT_TICKET);
     }
-
     function createNewTicket(e) {
         e.preventDefault();
         axios.post('http://localhost:4000/tickets/types', currentTicket, {
@@ -235,7 +173,6 @@ export default function AdministrationPage() {
             console.log(err);
         })
     }
-
     function updateEvent() {
         axios.put('http://localhost:4000/event', eventData, {
             headers: {
@@ -247,7 +184,6 @@ export default function AdministrationPage() {
             console.log(err);
         })
     }
-
     function getAvailableVacancy(rooms) {
         if (!rooms) return 0;
         let availableVacancy = 0;
