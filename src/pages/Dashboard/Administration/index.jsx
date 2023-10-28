@@ -482,4 +482,4 @@ export default function AdministrationPage() {
     (Ingressos) editar as informações sobre os tipos de ingressos do evento.//
     (Hotéis) editar as informações sobre os hotéis e seus respectivos quartos.
     (Atividades) editar as informações sobre as atividades do evento.
-*/
+*/ 
