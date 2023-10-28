@@ -21,6 +21,7 @@ import { UserProvider } from './contexts/UserContext';
 
 import useToken from './hooks/useToken';
 import GeneratedCertificate from './pages/Dashboard/Generated-Certificate';
+import AdministrationPage from './pages/Dashboard/Administration';
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
               <Route path="/enroll" element={<Enroll />} />
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="my-certificate" element={<GeneratedCertificate />} />
+              <Route path="/admin" element={<AdministrationPage/>} />
               <Route
                 path="/dashboard"
                 element={
