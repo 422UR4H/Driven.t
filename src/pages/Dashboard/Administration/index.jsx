@@ -1,23 +1,22 @@
 import { Typography } from '@mui/material';
 import React, { useEffect, Fragment } from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
 import Button from '../../../components/Form/Button';
 import { Row } from '../../../components/Auth';
-import Dashboard from '../../../layouts/Dashboard';
 import { RiCalendarEventLine } from 'react-icons/ri';
 import { BsFillTicketPerforatedFill, BsFillCalendar2DateFill } from 'react-icons/bs';
 import { MdHotel } from 'react-icons/md';
 import Input from '../../../components/Form/Input';
 import axios from 'axios';
 import useEvent from '../../../hooks/api/useEvent';
-import useTicketTypes from '../../../hooks/api/useTicketTypes';
 import useToken from '../../../hooks/useToken';
 import { getHotelsWithAllRooms } from '../../../services/hotelApi';
 import HotelCard from '../../../components/HotelCard';
 import { v4 as uuid } from 'uuid';
 import { formatPrice } from '../../../utils/formatPrice';
 import { useNavigate } from 'react-router-dom';
+import useTicketTypesAdmin from '../../../hooks/api/useTicketTypesAdmin';
+import { toast } from 'react-toastify';
 
 
 const State = {
@@ -34,7 +33,7 @@ const TicketMock = {
     includesHotel: true
 }
 
-const DEFAULT_TICKET = { id: 0, name: '', price: 0, isRemote: false, includesHotel: false };
+const DEFAULT_TICKET = { id: 1, name: '', price: 0, isRemote: false, includesHotel: false };
 
 export default function AdministrationPage() {
     const [eventData, setEventData] = useState(null);
@@ -43,20 +42,18 @@ export default function AdministrationPage() {
     const [activities, setActivities] = useState(null);
     const [state, setState] = useState(State.event);
     const { event, eventError, eventLoading } = useEvent();
-    const { ticketTypes, ticketTypesError, ticketTypesLoading, ticketTypesProcess } = useTicketTypes();
+    const { ticketTypes, ticketTypesError, ticketTypesLoading, ticketTypesProcess } = useTicketTypesAdmin();
     const [currentTicket, setCurrentTicket] = useState(DEFAULT_TICKET);
     const [editingTicket, setEditingTicket] = useState(false);
     const [hotelsLoading, setHotelsLoading] = useState(false);
     const [editingHotel, setEditingHotel] = useState(false);
     const [currentHotelFormInfo, setCurrentHotelFormInfo] = useState(null);
+    const [loadingEventEdition, setLoadingEventEdition] = useState(false);
     const token = useToken();
     const navigate = useNavigate();
     useEffect(() => {
         getHotelsInfo();
         if(!localStorage.getItem('admin')){
-            return navigate('/sign-in');
-        }
-        if(!localStorage.getItem('token')){
             return navigate('/sign-in');
         }
     }, []);
@@ -102,9 +99,10 @@ export default function AdministrationPage() {
             },
         }).then((res) => {
             getHotelsInfo().then((res) => {
-
+                toast('Sucesso ao editar hotel!');
             }).catch((err) => {
                 console.log(err);
+                toast('Não foi possível fazer a edição!');
             })
         }).catch((err) => {
             console.log(err);
@@ -147,12 +145,14 @@ export default function AdministrationPage() {
                 Authorization: `Bearer ${token}`,
             },
         }).then((res) => {
-            console.log(res);
+            
+            toast('Sucesso ao editar ticket!');
             ticketTypesProcess().then((res) => {
                 setEditingTicket(false);
                 setCurrentTicket(DEFAULT_TICKET);
             }).catch((err) => {
                 console.log(err);
+                toast('Falha ao editar ticket!');
             })
         }).catch((err) => {
             console.log(err);
@@ -170,21 +170,28 @@ export default function AdministrationPage() {
                 Authorization: `Bearer ${token}`,
             },
         }).then((res) => {
+            toast('Sucesso ao criar ticket!');
             setCurrentTicket(DEFAULT_TICKET);
-            console.log(res);
+            
         }).catch((err) => {
             console.log(err);
+            toast('Falha ao criar ticket!');
         })
     }
     function updateEvent() {
+        setLoadingEventEdition(true);
         axios.put('http://localhost:4000/event', eventData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         }).then((res) => {
-            console.log(res);
+            
+            toast('Sucesso ao criar/editar evento!');
         }).catch((err) => {
             console.log(err);
+            toast('Falha ao criar/editar evento!');
+        }).finally(()=>{
+            setLoadingEventEdition(false);
         })
     }
     function getAvailableVacancy(rooms) {
@@ -229,23 +236,23 @@ export default function AdministrationPage() {
                                 </Typography>
                                 <div>
                                     <label htmlFor="event-title">Title</label>
-                                    <Input onChange={(e) => setEventData({ ...eventData, title: e.target.value })} id='event-title' name='event-title' type="text" placeholder='Title' value={eventData?.title} />
+                                    <Input disabled={loadingEventEdition} onChange={(e) => setEventData({ ...eventData, title: e.target.value })} id='event-title' name='event-title' type="text" placeholder='Title' value={eventData?.title} />
                                 </div>
                                 <div>
                                     <label htmlFor="event-background">Background URL</label>
-                                    <Input onChange={(e) => setEventData({ ...eventData, backgroundImageUrl: e.target.value })} id='event-background' name='event-background' type="text" placeholder='Background URL' value={eventData?.backgroundImageUrl} />
+                                    <Input disabled={loadingEventEdition} onChange={(e) => setEventData({ ...eventData, backgroundImageUrl: e.target.value })} id='event-background' name='event-background' type="text" placeholder='Background URL' value={eventData?.backgroundImageUrl} />
                                 </div>
                                 <div>
                                     <label htmlFor="event-logo">Logo URL</label>
-                                    <Input onChange={(e) => setEventData({ ...eventData, logoImageUrl: e.target.value })} id='event-logo' name='event-logo' type="text" placeholder='Logo URL' value={eventData?.logoImageUrl} />
+                                    <Input disabled={loadingEventEdition} onChange={(e) => setEventData({ ...eventData, logoImageUrl: e.target.value })} id='event-logo' name='event-logo' type="text" placeholder='Logo URL' value={eventData?.logoImageUrl} />
                                 </div>
                                 <div>
                                     <label htmlFor="event-start-date">Start Date</label>
-                                    <Input onChange={(e) => setEventData({ ...eventData, startsAt: e.target.value })} id='event-start-date' name='event-start-date' type="date" value={eventData?.startsAt} />
+                                    <Input disabled={loadingEventEdition} onChange={(e) => setEventData({ ...eventData, startsAt: e.target.value })} id='event-start-date' name='event-start-date' type="date" value={eventData?.startsAt} />
                                 </div>
                                 <div>
                                     <label htmlFor="event-end-date">End Date</label>
-                                    <Input onChange={(e) => setEventData({ ...eventData, endsAt: e.target.value })} id='event-end-date' name='event-end-date' type="date" value={eventData?.endsAt} />
+                                    <Input disabled={loadingEventEdition} onChange={(e) => setEventData({ ...eventData, endsAt: e.target.value })} id='event-end-date' name='event-end-date' type="date" value={eventData?.endsAt} />
                                 </div>
 
                             </form>
@@ -265,7 +272,9 @@ export default function AdministrationPage() {
                                 </div>
                             </div>
                         </div>
-                        <Button onClick={() => updateEvent()} style={{ width: '100%' }}>Save</Button>
+                        <Button disabled={loadingEventEdition} onClick={() => updateEvent()} style={{ width: '100%' }}>
+                            {loadingEventEdition ? 'Carregando...' : 'Salvar'}
+                        </Button>
                     </div>
                 }
                 {
