@@ -21,7 +21,7 @@ export default function Enroll() {
   const { loadingSignUp, signUp } = useSignUp();
 
   const navigate = useNavigate();
-  
+
   const { eventInfo } = useContext(EventInfoContext);
 
   async function submit(event) {
@@ -41,10 +41,10 @@ export default function Enroll() {
   }
 
   return (
-    <AuthLayout background={eventInfo.backgroundImageUrl}>
+    <AuthLayout background={(eventInfo?.backgroundImageUrl || "background: linear-gradient(90deg, #FF4791 0.17%, #FFD77F 99.83%)")}>
       <Row>
-        <img src={eventInfo.logoImageUrl} alt="Event Logo" width="60px" />
-        <Title>{eventInfo.title}</Title>
+        {eventInfo && eventInfo.backgroundImageUrl && <img src={eventInfo?.logoImageUrl} alt="Event Logo" width="60px" />}
+        <Title>{(eventInfo?.title || "Error, no event found!")}</Title>
       </Row>
       <Row>
         <Label>Inscrição</Label>

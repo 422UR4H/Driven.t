@@ -416,9 +416,9 @@ export default function AdministrationPage() {
                 {
                     state === State.activities &&
                     <div style={{ padding: '20px ', display: 'flex', flexDirection: 'column', gap: '20px', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p variant='h2'>
-                            
-                        </p>
+                        <Typography variant='h2'>
+                            Atividades
+                        </Typography>
                     </div>
                 }
             </Row>
