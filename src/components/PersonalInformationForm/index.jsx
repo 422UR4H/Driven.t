@@ -43,7 +43,7 @@ export default function PersonalInformationForm() {
     onSubmit: async (data) => {
       const newData = {
         name: data.name,
-        cpf: data.cpf.replaceAll('.', '').replaceAll('-', ''),
+        cpf: data.cpf.replaceAll(/[^a-zA-Z0-9\s]/g, '').trim(),
         birthday: dayjs(data.birthday).toISOString(),
         address: {
           cep: data.cep,
