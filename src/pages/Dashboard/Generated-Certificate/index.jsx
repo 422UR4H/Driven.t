@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import logo from '../../../assets/images/logo.png';
 import Page from '../../../components/Page';
@@ -10,6 +10,19 @@ import Typo from '../../../components/Dashboard/Content/Typo';
 export default function GeneratedCertificate() {
     const location = useLocation();
     const userInfo = location.state;
+
+    useEffect(()=>{
+        window.print();
+    },[])
+    function formatarCPF(cpf) {
+      cpf = cpf.replace(/\D/g, '');
+      if (cpf.length !== 11) {
+        return 'CPF inválido';
+      }
+      return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    
+
     if(!userInfo) return (<Typo variant='h1'>Erro ao gerar certificado</Typo>);
     return (
         <Page style={{background: "#CECECE"}}>
@@ -20,7 +33,7 @@ export default function GeneratedCertificate() {
                     <h2 style={{fontSize:'32px'}}>Certificamos, para todos os  devidos fins, de que a(o):</h2>
                     <h3 style={{fontSize:'96px'}}>{userInfo?.name}</h3>
                     <p style={{fontSize:'32px', textAlign:'left'}}>
-                    Com documento XXX.XXX.XXX-XX participou do evento {userInfo?.eventName}, de forma {userInfo?.participationMode?.toUpperCase()}, entre os dias {userInfo?.enrollDate} e {userInfo?.endDate}.</p>
+                    Com documento {formatarCPF(userInfo?.documentNumber)} participou do evento {userInfo?.eventName}, de forma {userInfo?.participationMode?.toUpperCase()}, entre os dias {userInfo?.enrollDate} e {userInfo?.endDate}.</p>
                     <img src={logo} alt="" />
                 </Row>
             </StyledContainer>
