@@ -9,13 +9,9 @@ import useEnrollment from '../../../hooks/api/useEnrollment';
 import { useGetTicket } from '../../../hooks/api/useTicket';
 import styled from 'styled-components';
 import Loader from 'react-loader-spinner';
+import useToken from '../../../hooks/useToken';
+import api from '../../../services/api';
 
-
-/*
-- Para usuários presenciais, é necessário que ele tenha participado de pelo menos cinco atividades durante todos os dias do evento.
-*/
-
-// rota backend para pegar as atividades de um usuario
 
 export default function Certificate() {
   const [isEventFinished, setIsEventFinished] = useState(false);
@@ -24,6 +20,8 @@ export default function Certificate() {
   const { ticketLoading, ticket, ticketError } = useGetTicket();
   const [loading, setLoading] = useState(false);
   const { enrollmentLoading, enrollment, enrollmentError } = useEnrollment();
+  const [activitiesCount, setActivitiesCount] = useState(0);
+  const token = useToken();
   const user = {
     name: enrollment?.name,
     documentNumber: enrollment?.cpf,
@@ -41,6 +39,14 @@ export default function Certificate() {
     setIsEventFinished(isAfterEvent);
   }, [eventInfo]);
 
+  useEffect(() => {
+    api.get('/activities/count/my-activities-day-count', { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => {
+        setActivitiesCount(res.data.count);
+      }).catch((err) => {
+        console.log(err)
+      })
+  }, [])
 
 
   const navigate = useNavigate();
@@ -76,16 +82,20 @@ export default function Certificate() {
               />
               <Typo variant="h6" color="#8E8E8E">Carregando informações...</Typo>
             </StupidMUI>
-
             :
-            (enrollmentError || ticketError) ?
-              <>
-                <Typo variant="h6" color="#8E8E8E">Erro ao carregar informações</Typo>
-              </>
-              :
+            activitiesCount < 5 ?
               <StupidMUI>
-                <Typo variant="h6" color="#8E8E8E">O certificado ficará disponível apenas 1 dia após a realização do evento.</Typo>
+                <Typo variant="h6" color="#8E8E8E">Para gerar seu certificado, é necessário que você tenha participado de pelo menos 5 atividades durante todos os dias do evento.</Typo>
               </StupidMUI>
+              :
+              (enrollmentError || ticketError) ?
+                <>
+                  <Typo variant="h6" color="#8E8E8E">Erro ao carregar informações</Typo>
+                </>
+                :
+                <StupidMUI>
+                  <Typo variant="h6" color="#8E8E8E">O certificado ficará disponível apenas 1 dia após a realização do evento.</Typo>
+                </StupidMUI>
       }
     </Row>
   );
