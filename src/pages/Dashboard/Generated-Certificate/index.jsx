@@ -12,7 +12,9 @@ export default function GeneratedCertificate() {
     const userInfo = location.state;
 
     useEffect(()=>{
-        window.print();
+        setTimeout(() => {
+          window.print();
+        }, 5000);
     },[])
     function formatarCPF(cpf) {
       cpf = cpf.replace(/\D/g, '');
