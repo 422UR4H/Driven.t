@@ -20,7 +20,6 @@ import CheckCircleIcon from '../../assets/images/checkmark.svg';
 import creditCardExample from '../../assets/images/creditCard.png';
 import Loader from 'react-loader-spinner';
 
-
 export default function PaymentForm({ ticketType }) {
   const [isLoading, setIsLoading] = useState(false);
   const [disableForm, setDisableForm] = useState(false);

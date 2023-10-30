@@ -163,17 +163,28 @@ export default function SelectActivity({ selectedDay }) {
 
 const PageWrapper = styled.div`
 
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 250px);
   margin: 30px 0;
+
+  @media (max-width: 950px) {
+    grid-template-columns: repeat(2, 250px);
+    grid-template-rows: repeat(2, 250px);
+    justify-content: center;
+  }
+
+  @media (max-width: 690px) {
+    grid-template-columns: repeat(1, 250px);
+  }
 `;
 
 const Wrapper = styled.div`
 
-  width: 300px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  padding-bottom: 15px;
 
   h2 {
     font-size: 16px;

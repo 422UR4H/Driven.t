@@ -7,7 +7,8 @@ import HotelCard from '../../../components/HotelCard';
 import { postBooking, getBooking, getHotelsWithAllRooms, changeBooking } from '../../../services/hotelApi';
 import { v4 as uuid } from 'uuid';
 import DefaultLoader from '../../../components/DefaultLoader.jsx';
-
+import useEnrollment from '../../../hooks/api/useEnrollment';
+import { useGetTicket } from '../../../hooks/api/useTicket';
 
 export default function Hotel() {
   const [hotels, setHotels] = useState([]);
@@ -21,9 +22,20 @@ export default function Hotel() {
   const token = useToken();
   const [loading, setLoading] = useState(false);
 
+  const [ validOperation, setValidOperation ] = useState(null);
+  const { enrollment } = useEnrollment();
+  const { ticket } = useGetTicket();
+
   useEffect(() => {
+
+    const { isValidOperation } = validateUserOperation();
+    if (!isValidOperation) {
+      setValidOperation(false);
+    }
+
     getInfo();
-  }, []);
+
+  }, [enrollment]);
 
   async function getInfo() {
     setLoading(true);
@@ -38,6 +50,7 @@ export default function Hotel() {
         const roomBooked = hotelBooked.Rooms.find((room) => room.id === booking.Room.id);
         setSelectedRoom(roomBooked);
         setReservedRoom(true);
+        setValidOperation(true);
       } else {
         setUserHasBooked(false);
       }
@@ -95,11 +108,6 @@ export default function Hotel() {
     return room.capacity - room.Booking.length;
   }
 
-  function getAvailableVacancyOfRoom(room) {
-    if (!room) return 0;
-    return room.capacity - room.Booking.length;
-  }
-
   function getVacancyIcons(room, selected = false) {
     let occupiedIcons = [];
     let emptyIcons = [];
@@ -118,6 +126,45 @@ export default function Hotel() {
     }
     const icons = [...occupiedIcons, ...emptyIcons]
     return icons.map((icon) => (icon));
+  }
+
+  function validateUserOperation() {
+
+    let isValidOperation = true;
+    let message = null;
+
+    if (!enrollment) {
+      message = `Você precisa completar sua inscrição antes de prosseguir pra escolha de hoteis`;
+    }
+
+    else if (!ticket) {
+      message = `Você precisa efetuar o pagamento do seu ingresso antes de prosseguir pra escolha de hoteis`;
+    }
+
+    else if (ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) {
+      message = `O tipo do seu ingresso não permite a escolha de hoteis`;
+    }
+
+    if (message !== null) {
+      isValidOperation = false;
+    } else {
+      setValidOperation(true);
+    }
+
+    return { isValidOperation, message };
+  }
+
+  if (!validOperation) {
+
+    const { message } = validateUserOperation();
+    return (
+      <>
+        <Typo variant="h4">Escolha de hotel e quarto</Typo>
+        <VoidContainer>
+          <Typo variant="h6" color="#8E8E8E">{message}</Typo>
+        </VoidContainer>
+      </>
+    )
   }
 
   if (selectedHotel && selectedRoom && reservedRoom) {
@@ -202,15 +249,14 @@ export default function Hotel() {
   );
 }
 
+const VoidContainer = styled.div`
+    text-align: center;
+    height: 80%;
 
-const StupidMUI = styled.div`
-  width: 100%;
-  margin-top: 25%;
-  margin-left: 25%;
-  text-align: center;
-  transform: translateX(-25%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
-
 
 const ContainerPai = styled.div`
   display: flex;
