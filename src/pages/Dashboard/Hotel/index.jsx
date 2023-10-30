@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Typo from '../../../components/Dashboard/Content/Typo';
 import { BsPerson, BsPersonFill } from 'react-icons/bs';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import useToken from '../../../hooks/useToken';
 import HotelCard from '../../../components/HotelCard';
 import { postBooking, getBooking, getHotelsWithAllRooms, changeBooking } from '../../../services/hotelApi';
@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
 import DefaultLoader from '../../../components/DefaultLoader.jsx';
 import useEnrollment from '../../../hooks/api/useEnrollment';
 import { useGetTicket } from '../../../hooks/api/useTicket';
+import UserContext from '../../../contexts/UserContext';
 
 export default function Hotel() {
   const [hotels, setHotels] = useState([]);
@@ -21,7 +22,7 @@ export default function Hotel() {
   const [gettingNewHotels, setGettingNewHotels] = useState(false);
   const token = useToken();
   const [loading, setLoading] = useState(false);
-
+  const {userData} = useContext(UserContext);
   const [ validOperation, setValidOperation ] = useState(null);
   const { enrollment } = useEnrollment();
   const { ticket } = useGetTicket();
@@ -63,7 +64,8 @@ export default function Hotel() {
     if (creatingBooking) return;
     setCreatingBooking(true);
     setReservedRoom(true);
-    if (userHasBooked) {
+    const booking = await getBooking(token);
+    if (booking) {
       await changeBooking(token, { roomId: selectedRoom.id });
       const hg = await getHotelsWithAllRooms(token);
       const rb = hg.find((hotel) => hotel.id === selectedHotel.id).Rooms.find((room) => room.id === selectedRoom.id);
@@ -118,7 +120,9 @@ export default function Hotel() {
     for (let index = 0; index < vacancies; index++) {
       emptyIcons.push(<BsPerson key={`${uuid()}-empty`} />);
     }
-    if (occupiedIcons.length > 0) {
+    const data = JSON.parse(localStorage.getItem('userData'));
+    const imAmAtRoom = data && room.Booking.find((booking) => booking.userId === data.user?.id);
+    if (occupiedIcons.length > 0 && imAmAtRoom) {
       occupiedIcons[0] = <BsPersonFill style={{ color: '#FF4791' }} key={`${uuid()}-fill`} />;
     }
     if (emptyIcons.length > 0 && selected) {
